@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator Console - VitalSync</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <span>Vital</span>Sync
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="admin.html" class="active">Admin Console</a></li>
+        </ul>
+        <div class="nav-user">
+            <span id="admin-display-name" style="font-weight: 500; color: var(--text-secondary);">Administrator</span>
+            <button onclick="handleLogout()" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">Sign Out</button>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="admin-container">
+        
+        <!-- Header banner -->
+        <section class="admin-header">
+            <div>
+                <h1>Platform Management</h1>
+                <span>Overviewing system analytics and active user directories</span>
+            </div>
+        </section>
+
+        <!-- Stats Overview Row -->
+        <section class="admin-stats-grid">
+            <div class="glass-card stat-widget">
+                <span class="stat-title">Platform Users</span>
+                <span class="stat-value" id="stat-total-users">0</span>
+                <span class="stat-desc">Registered profiles</span>
+            </div>
+            <div class="glass-card stat-widget">
+                <span class="stat-title">Total Health Logs</span>
+                <span class="stat-value" id="stat-total-logs">0</span>
+                <span class="stat-desc">Steps, water, sleep, & pulse logs</span>
+            </div>
+            <div class="glass-card stat-widget">
+                <span class="stat-title">Steps Entries</span>
+                <span class="stat-value" id="stat-steps-count">0</span>
+                <span class="stat-desc">Daily motion updates</span>
+            </div>
+            <div class="glass-card stat-widget">
+                <span class="stat-title">Hydration Logs</span>
+                <span class="stat-value" id="stat-water-count">0</span>
+                <span class="stat-desc">Water volumes registered</span>
+            </div>
+        </section>
+
+        <!-- Growth Chart Panel -->
+        <section class="glass-card admin-chart-card">
+            <h3>User Registration Growth</h3>
+            <div class="admin-chart-container">
+                <canvas id="chart-growth"></canvas>
+            </div>
+        </section>
+
+        <!-- Dynamic User & Records Directories Split -->
+        <section class="admin-split-grid">
+            
+            <!-- Users Account Directory -->
+            <div class="glass-card">
+                <h3>User Accounts Registry</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Search, view, and purge user profiles.</p>
+                
+                <div class="search-box-wrapper">
+                    <input type="text" id="search-users-input" class="input-field" placeholder="Search by name or email..." style="padding: 10px 14px;">
+                    <button onclick="fetchUsersList()" class="btn btn-primary" style="padding: 10px 20px;">Search</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">No records loaded</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Global Logs Audit Trail -->
+            <div class="glass-card">
+                <h3>Telemetry Logs Audit Trail</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Purge corrupt, invalid, or trailing health entries.</p>
+                
+                <div class="table-wrapper" style="max-height: 480px; overflow-y: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">No logs loaded</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Edit User Profile Modal -->
+    <div class="modal-overlay" id="edit-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit User Profile</h3>
+                <button class="modal-close-btn" onclick="closeModal('edit-user-modal')">&times;</button>
+            </div>
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="input-group">
+                    <label for="edit-user-name">Full Name</label>
+                    <input type="text" id="edit-user-name" class="input-field" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="edit-user-email">Email Address</label>
+                    <input type="email" id="edit-user-email" class="input-field" required autocomplete="off">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="input-group">
+                        <label for="edit-user-age">Age</label>
+                        <input type="number" id="edit-user-age" class="input-field" required min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="edit-user-gender">Gender</label>
+                        <select id="edit-user-gender" class="input-field" required style="padding: 11px 16px;">
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="edit-user-role">Role</label>
+                    <select id="edit-user-role" class="input-field" required style="padding: 11px 16px;">
+                        <option value="user">User</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-overlay" id="reset-password-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reset User Password</h3>
+                <button class="modal-close-btn" onclick="closeModal('reset-password-modal')">&times;</button>
+            </div>
+            <form id="reset-password-form">
+                <input type="hidden" id="reset-pass-user-id">
+                <div class="input-group">
+                    <label for="reset-pass-name">User Name</label>
+                    <input type="text" id="reset-pass-name" class="input-field" readonly disabled>
+                </div>
+                <div class="input-group">
+                    <label for="reset-pass-value">New Password</label>
+                    <input type="password" id="reset-pass-value" class="input-field" placeholder="Min. 8 characters" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">Reset Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS Inclusions -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

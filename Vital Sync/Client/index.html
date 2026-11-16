@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalSync - Your Wellness, Connected</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 20px 60px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.15;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 40px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-icon {
+            font-size: 2.2rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .feature-card.steps .feature-icon { color: var(--steps-color); }
+        .feature-card.water .feature-icon { color: var(--water-color); }
+        .feature-card.sleep .feature-icon { color: var(--sleep-color); }
+        .feature-card.heart .feature-icon { color: var(--heart-color); }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .footer {
+            border-top: 1px solid var(--border-glass);
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <span>Vital</span>Sync
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="auth.html" id="nav-dashboard-link">Dashboard</a></li>
+        </ul>
+        <div class="nav-user">
+            <a href="auth.html" class="btn btn-secondary" id="auth-btn">Sign In</a>
+        </div>
+    </nav>
+
+    <!-- Hero Area -->
+    <header class="hero">
+        <h1>Simplify Tracking. Optimize Health. <span>Your Wellness, Connected</span></h1>
+        <p>Monitor your daily steps, water intake, sleep cycles, and heart rate trends in a unified interface. Set goals, track trends, and take control of your well-being today.</p>
+        <div class="hero-actions">
+            <a href="auth.html" class="btn btn-primary" id="hero-cta-btn">Get Started for Free</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features-grid">
+        <div class="glass-card feature-card steps">
+            <div class="feature-icon">👣</div>
+            <h3>Daily Steps Logging</h3>
+            <p>Log steps incrementally. Monitor daily movements, view aggregates, and track updates on responsive bars.</p>
+        </div>
+        <div class="glass-card feature-card water">
+            <div class="feature-icon">💧</div>
+            <h3>Water Tracking</h3>
+            <p>Maintain proper hydration levels by logging water intake as you drink. Visual water meters update dynamically.</p>
+        </div>
+        <div class="glass-card feature-card sleep">
+            <div class="feature-icon">🌙</div>
+            <h3>Sleep Monitoring</h3>
+            <p>Track your sleeping schedule, inspect duration details, and identify anomalies to improve rest quality.</p>
+        </div>
+        <div class="glass-card feature-card heart">
+            <div class="feature-icon">💓</div>
+            <h3>Heart Rate Analysis</h3>
+            <p>Record and store pulse levels. Dynamic triggers warn you if values fall outside standard parameters.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 VitalSync Platform. All Rights Reserved. Empowering healthy habits daily.</p>
+    </footer>
+
+    <!-- Verification Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // Update auth buttons and link routes
+                    const authBtn = document.getElementById('auth-btn');
+                    authBtn.textContent = 'Dashboard';
+                    authBtn.className = 'btn btn-primary';
+                    authBtn.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+
+                    const navDashboardLink = document.getElementById('nav-dashboard-link');
+                    navDashboardLink.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+
+                    const heroCta = document.getElementById('hero-cta-btn');
+                    heroCta.textContent = `Welcome back, ${user.name}`;
+                    heroCta.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+                } catch (e) {
+                    console.error("Error parsing stored session details", e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

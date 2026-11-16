@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - VitalSync</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">
+            <span>Vital</span>Sync
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li id="admin-nav-item" style="display: none;"><a href="admin.html">Admin Console</a></li>
+        </ul>
+        <div class="nav-user">
+            <span id="user-display-name" style="font-weight: 500; color: var(--text-secondary);">User</span>
+            <button onclick="handleLogout()" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;">Sign Out</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="dashboard-container">
+        
+        <!-- Header Banner & Notification Triggers -->
+        <section class="welcome-banner">
+            <div>
+                <h1 id="greeting-title">Hello, User</h1>
+                <span id="current-date-string">Thursday, June 4, 2026</span>
+            </div>
+            
+            <div class="banner-actions">
+                <a href="admin.html" class="btn btn-primary" id="admin-banner-btn" style="display: none; padding: 10px 18px; font-size: 0.9rem;">
+                    ⚙️ Administrative Portal
+                </a>
+                
+                <!-- Notifications Bell Dropdown -->
+                <div class="notif-wrapper">
+                    <button class="notif-bell" id="bell-btn" onclick="toggleNotifications(event)">
+                        🔔
+                        <span class="notif-badge" id="bell-badge" style="display: none;">0</span>
+                    </button>
+                    
+                    <div class="glass-card notif-dropdown" id="notif-panel">
+                        <div class="notif-header">
+                            <h4>Recent Notifications</h4>
+                            <span onclick="markAllNotificationsRead()">Mark all read</span>
+                        </div>
+                        <div class="notif-list" id="notifications-container">
+                            <div class="no-notifs">No active notifications</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        <!-- Dynamic Reminder Cards Panel -->
+        <div id="reminders-panel" class="reminders-container" style="display: none; margin-bottom: 8px;">
+            <!-- Reminders will load here -->
+        </div>
+
+        <!-- Dynamic Overview Cards -->
+        <section class="metrics-overview-grid">
+            
+            <!-- Steps Card -->
+            <div class="glass-card metric-widget steps">
+                <div class="metric-widget-header">
+                    <span class="metric-title">Steps Walked</span>
+                    <span class="metric-icon">👣</span>
+                </div>
+                <div class="metric-value-wrap">
+                    <div class="metric-value"><span id="metric-steps-current">0</span><span id="metric-steps-target">/ 0 steps</span></div>
+                </div>
+                <div>
+                    <div class="metric-progress-bar-bg">
+                        <div class="metric-progress-bar" id="progress-steps"></div>
+                    </div>
+                    <div class="metric-footer" id="footer-steps">0% achieved today</div>
+                </div>
+            </div>
+
+            <!-- Hydration Card -->
+            <div class="glass-card metric-widget water">
+                <div class="metric-widget-header">
+                    <span class="metric-title">Water Intake</span>
+                    <span class="metric-icon">💧</span>
+                </div>
+                <div class="metric-value-wrap">
+                    <div class="metric-value"><span id="metric-water-current">0</span><span id="metric-water-target">/ 0 ml</span></div>
+                </div>
+                <div>
+                    <div class="metric-progress-bar-bg">
+                        <div class="metric-progress-bar" id="progress-water"></div>
+                    </div>
+                    <div class="metric-footer" id="footer-water">0% achieved today</div>
+                </div>
+            </div>
+
+            <!-- Sleep Card -->
+            <div class="glass-card metric-widget sleep">
+                <div class="metric-widget-header">
+                    <span class="metric-title">Sleep Duration</span>
+                    <span class="metric-icon">🌙</span>
+                </div>
+                <div class="metric-value-wrap">
+                    <div class="metric-value"><span id="metric-sleep-current">0</span><span id="metric-sleep-target">/ 0 hours</span></div>
+                </div>
+                <div>
+                    <div class="metric-progress-bar-bg">
+                        <div class="metric-progress-bar" id="progress-sleep"></div>
+                    </div>
+                    <div class="metric-footer" id="footer-sleep">0% achieved today</div>
+                </div>
+            </div>
+
+            <!-- Heart Rate Card -->
+            <div class="glass-card metric-widget heart">
+                <div class="metric-widget-header">
+                    <span class="metric-title">Heart Rate</span>
+                    <span class="metric-icon">💓</span>
+                </div>
+                <div class="metric-value-wrap">
+                    <div class="metric-value"><span id="metric-heart-current">--</span><span> bpm</span></div>
+                </div>
+                <div>
+                    <div class="metric-progress-bar-bg">
+                        <div class="metric-progress-bar" id="progress-heart" style="width: 100%; background: rgba(255, 255, 255, 0.1);"></div>
+                    </div>
+                    <div class="metric-footer" id="footer-heart">Last measurement logged</div>
+                </div>
+            </div>
+            
+        </section>
+
+        <!-- Two-Column Grid: Form Logs & Goal Configuration -->
+        <section class="dashboard-grid">
+            
+            <!-- Daily Log Card -->
+            <div class="glass-card">
+                <div class="log-panel-tabs">
+                    <button class="log-tab-btn steps active" onclick="switchLogTab(event, 'steps')">👣 Steps</button>
+                    <button class="log-tab-btn water" onclick="switchLogTab(event, 'water')">💧 Water</button>
+                    <button class="log-tab-btn sleep" onclick="switchLogTab(event, 'sleep')">🌙 Sleep</button>
+                    <button class="log-tab-btn heart" onclick="switchLogTab(event, 'heart')">💓 Pulse</button>
+                </div>
+
+                <!-- Steps Input Form -->
+                <div class="log-form-container active" id="log-form-steps">
+                    <h3 style="margin-bottom: 16px;">Log Steps Walked</h3>
+                    <form id="form-steps">
+                        <div class="input-group">
+                            <label for="input-steps-value">Step Count</label>
+                            <input type="number" id="input-steps-value" class="input-field" placeholder="e.g. 5000" min="1" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-steps-date">Date Logged</label>
+                            <input type="date" id="input-steps-date" class="input-field">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Record Steps</button>
+                    </form>
+                </div>
+
+                <!-- Water Input Form -->
+                <div class="log-form-container" id="log-form-water">
+                    <h3 style="margin-bottom: 16px;">Log Hydration Intake</h3>
+                    <div class="quick-log-options">
+                        <button onclick="quickLogWater(250)" class="btn btn-secondary">+250 ml</button>
+                        <button onclick="quickLogWater(500)" class="btn btn-secondary">+500 ml</button>
+                        <button onclick="quickLogWater(750)" class="btn btn-secondary">+750 ml</button>
+                    </div>
+                    <form id="form-water">
+                        <div class="input-group">
+                            <label for="input-water-value">Custom Amount (ml)</label>
+                            <input type="number" id="input-water-value" class="input-field" placeholder="e.g. 330" min="1" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-water-date">Date Logged</label>
+                            <input type="date" id="input-water-date" class="input-field">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Record Water</button>
+                    </form>
+                </div>
+
+                <!-- Sleep Input Form -->
+                <div class="log-form-container" id="log-form-sleep">
+                    <h3 style="margin-bottom: 16px;">Log Sleep Duration</h3>
+                    <form id="form-sleep">
+                        <div class="input-group">
+                            <label for="input-sleep-value">Sleep Time (hours)</label>
+                            <input type="number" id="input-sleep-value" class="input-field" placeholder="e.g. 7.5" step="0.1" min="0.1" max="24" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-sleep-date">Date Logged</label>
+                            <input type="date" id="input-sleep-date" class="input-field">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Record Sleep</button>
+                    </form>
+                </div>
+
+                <!-- Heart Rate Input Form -->
+                <div class="log-form-container" id="log-form-heart">
+                    <h3 style="margin-bottom: 16px;">Record Heart Rate</h3>
+                    <form id="form-heart">
+                        <div class="input-group">
+                            <label for="input-heart-value">Pulse Speed (BPM)</label>
+                            <input type="number" id="input-heart-value" class="input-field" placeholder="e.g. 72" min="30" max="250" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-heart-date">Date Logged</label>
+                            <input type="date" id="input-heart-date" class="input-field">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Record Heart Rate</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Goal Settings Card -->
+            <div class="glass-card">
+                <h3>My Daily Goals</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Configure your daily lifestyle targets.</p>
+                
+                <div class="goals-list">
+                    <!-- Goal: Steps -->
+                    <div class="goal-setup-row">
+                        <div class="goal-setup-info">
+                            <span class="goal-setup-name">👣 Daily Steps</span>
+                            <span class="goal-setup-current" id="goal-current-steps">Current Target: 0</span>
+                        </div>
+                        <div class="goal-setup-input-wrapper">
+                            <input type="number" id="goal-input-steps" class="input-field goal-setup-input" placeholder="10000" min="100">
+                            <button onclick="saveGoal('steps')" class="btn btn-primary goal-setup-save-btn">Save</button>
+                        </div>
+                    </div>
+
+                    <!-- Goal: Hydration -->
+                    <div class="goal-setup-row">
+                        <div class="goal-setup-info">
+                            <span class="goal-setup-name">💧 Hydration (ml)</span>
+                            <span class="goal-setup-current" id="goal-current-water">Current Target: 0</span>
+                        </div>
+                        <div class="goal-setup-input-wrapper">
+                            <input type="number" id="goal-input-water" class="input-field goal-setup-input" placeholder="2500" min="100">
+                            <button onclick="saveGoal('water')" class="btn btn-primary goal-setup-save-btn">Save</button>
+                        </div>
+                    </div>
+
+                    <!-- Goal: Sleep -->
+                    <div class="goal-setup-row">
+                        <div class="goal-setup-info">
+                            <span class="goal-setup-name">🌙 Sleep Time (hrs)</span>
+                            <span class="goal-setup-current" id="goal-current-sleep">Current Target: 0</span>
+                        </div>
+                        <div class="goal-setup-input-wrapper">
+                            <input type="number" id="goal-input-sleep" class="input-field goal-setup-input" placeholder="8" step="0.5" min="1">
+                            <button onclick="saveGoal('sleep')" class="btn btn-primary goal-setup-save-btn">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Charts Trends Panels -->
+        <section class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                <h3>Historical Wellness Trends</h3>
+                <div class="trends-toggle-container">
+                    <button id="toggle-days-7" onclick="changeTrendsRange(7)" class="trends-toggle-btn active">Weekly (7d)</button>
+                    <button id="toggle-days-30" onclick="changeTrendsRange(30)" class="trends-toggle-btn">Monthly (30d)</button>
+                </div>
+            </div>
+            <div class="charts-grid">
+                
+                <!-- Steps Trends Chart -->
+                <div class="glass-card chart-card">
+                    <h4>Steps History</h4>
+                    <div class="chart-container">
+                        <canvas id="chart-steps"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hydration Trends Chart -->
+                <div class="glass-card chart-card">
+                    <h4>Water Intake (ml)</h4>
+                    <div class="chart-container">
+                        <canvas id="chart-water"></canvas>
+                    </div>
+                </div>
+
+                <!-- Sleep Trends Chart -->
+                <div class="glass-card chart-card">
+                    <h4>Sleep Records (hours)</h4>
+                    <div class="chart-container">
+                        <canvas id="chart-sleep"></canvas>
+                    </div>
+                </div>
+
+                <!-- Heart Rate Trends Chart -->
+                <div class="glass-card chart-card">
+                    <h4>Pulse Log (BPM)</h4>
+                    <div class="chart-container">
+                        <canvas id="chart-heart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- External Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- App API Client & Script logic -->
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
